@@ -29,16 +29,17 @@ enum TextDecoration: String {
     case success    = "<✔>"
     case error      = "<X>"
     case warning    = "<!>"
-    case systemInfo = "-->"
+    case systemInfo = "..."
+    
 }
 
 // KONEC
 
 /// Důležité funkce
-func writeToConsole(format: TextDecoration, message: String) {
-    print("\(format.rawValue) \(message)")
+func writeToConsole(format: TextDecoration, message: String) { // Psaní do konzole
+    print("\(format.rawValue) \(message) \(newLine())")
 }
-func indentLine(indentSize: IndentationOptions) -> String {
+func indentLine(indentSize: IndentationOptions) -> String { // Odsazení zpráv
     var iterator: Int = 0
     
     let loopConstant: Int
@@ -62,26 +63,18 @@ func indentLine(indentSize: IndentationOptions) -> String {
     
     return outputSpaces
 }
-func newLine() -> String {
+func newLine() -> String { // Vlastní implementace nového řádku. Automaticky odsazuje nové řádky
     return "\n\(indentLine(indentSize: .messageNewline))"
 }
 
-func folderExists(at subfolder: String) -> Bool {
+func folderExists(at subfolder: String) -> Bool { // Zjištění, jestli složka existuje
     if fileManager.fileExists(atPath: workingDirectory_path.appendingFormat("/" + subfolder)) {
         return true
     } else {
         return false
     }
 }
-func assetsFolderExists() -> Bool {
-    if fileManager.fileExists(atPath: workingDirectory_path) {
-        return true
-    } else {
-        return false
-    }
-}
-
-func createSubfolder(of folder: String, name: String) {
+func createSubfolder(of folder: String, name: String) { // Vytvoření podsložky ve složce Assets. Aby se to nesralo do souborového systému uživatele
     do {
         try fileManager.createDirectory(atPath: workingDirectory_path.appendingFormat("/" + name), withIntermediateDirectories: true, attributes: nil)
         writeToConsole(format: .success, message: "Folder Created!\(newLine())At: \(workingDirectory_path.appendingFormat("/" + name))")
@@ -89,7 +82,15 @@ func createSubfolder(of folder: String, name: String) {
         writeToConsole(format: .error, message: "Unable to create this folder!\nError Message: \(error.debugDescription)")
     }
 }
-func createAssetsFolder() {
+
+func assetsFolderExists() -> Bool { // Zjištění, jestli složka Assets existuje. Vlastní funkce, protože tohle je jediná funkce, která funguje jinde, než ve složce Assets
+    if fileManager.fileExists(atPath: workingDirectory_path) {
+        return true
+    } else {
+        return false
+    }
+}
+func createAssetsFolder() { // Vytvoření složky Assets
     do {
         try fileManager.createDirectory(atPath: workingDirectory_path, withIntermediateDirectories: false, attributes: nil)
         writeToConsole(format: .success, message: "Assets folder created!")
@@ -97,6 +98,7 @@ func createAssetsFolder() {
         writeToConsole(format: .error, message: "Unable to create the Assets folder!\nError Message: \(error.debugDescription)")
     }
 }
+
 func setFoldersUp() {
     createAssetsFolder()
     createSubfolder(of: workingDirectory_path, name: instancesDirectory_name)
@@ -105,10 +107,24 @@ func setFoldersUp() {
 // KONEC
 
 /// Vlastní kód
+writeToConsole(format: .header, message: "MC Server Manager")
+writeToConsole(format: .systemInfo, message: "Checking is everything is good")
 if assetsFolderExists() {
-    writeToConsole(format: .systemInfo, message: "Existuje")
+    writeToConsole(format: .systemInfo, message: "All good! Found the Assets folder")
 } else {
-    writeToConsole(format: .systemInfo, message: "Neexistuje")
-    setFoldersUp()
+    writeToConsole(format: .systemInfo, message: "Couldn't find the Assets folder.\(newLine())Would you like to make a new one from scratch?\(newLine())[y] Re-create all folders and files from scratch\(newLine())[n] Exit")
+    
+    let setUpAnswer = readLine()
+    switch setUpAnswer {
+    case "y":
+        writeToConsole(format: .success, message: "Alright, let's get everything set up")
+        setFoldersUp()
+    case "n":
+        writeToConsole(format: .success, message: "Understandable, have a nice day")
+        print("*dies*")
+        exit(-1)
+    default:
+        writeToConsole(format: .error, message: "You didn't put in the correct answer")
+    }
 }
 // KONEC
