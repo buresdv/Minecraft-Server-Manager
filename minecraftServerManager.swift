@@ -3,6 +3,8 @@
 import Foundation
 
 /// Nastavování důležitých proměnných
+var keepProgramActive: Bool = true
+
 let fileManager = FileManager.default
 let currentFolder = fileManager.currentDirectoryPath
 
@@ -30,7 +32,7 @@ enum TextDecoration: String {
     case error      = "<X>"
     case warning    = "<!>"
     case systemInfo = "..."
-    
+    case none       = ""
 }
 
 // KONEC
@@ -111,17 +113,18 @@ func setFoldersUp() {
     createSubfolder(of: workingDirectory_path, name: instancesDirectory_name)
     createSubfolder(of: workingDirectory_path, name: sharedConfigDirectory_name)
 }
+
 // KONEC
 
 /// Vlastní kód
 writeToConsole(format: .header, message: "MC Server Manager")
-writeToConsole(format: .systemInfo, message: "Checking is everything is good")
+writeToConsole(format: .systemInfo, message: "Checking if everything is good")
 if assetsFolderExists() {
     writeToConsole(format: .systemInfo, message: "All good! Found the Assets folder")
 } else {
     writeToConsole(format: .warning, message: "Couldn't find the Assets folder.\(newLine())Would you like to make a new one from scratch?\(newLine())[y] Re-create all folders and files from scratch\(newLine())[n] Exit")
     
-    let setUpAnswer = readLine()
+    var setUpAnswer = readLine()
     switch setUpAnswer {
     case "y":
         writeToConsole(format: .success, message: "Alright, let's get everything set up")
@@ -130,6 +133,47 @@ if assetsFolderExists() {
         exitProgram(funny: true)
     default:
         writeToConsole(format: .error, message: "You didn't put in the correct answer")
+        #warning("This under here does not to anything yet")
+        setUpAnswer = readLine()
     }
+}
+
+/// Enum pro ovládání
+enum AvailableCommands {
+    case n // Nová instance
+    case l // Seznam instancí
+    case s // Spuštění serveru
+    case d // Smazání instancí
+    case q // Ukončení programu
+}
+
+// KONEC
+
+/// Funkce pro hlavní loop
+func displayHelp() {
+    writeToConsole(format: .header, message: "Available commands")
+    writeToConsole(format: .helper, message: "[n] Create new instance\(newLine())[l] List available instances\(newLine())[s] Begin startup process for an instance\(newLine())[d] Delete instance\(newLine())[q] Quit")
+    print("")
+    print("")
+    print("")
+}
+
+func createNewInstance(called instanceName: String) {
+    writeToConsole(format: .systemInfo, message: "Creating instance folder for instance \(instanceName)")
+    createSubfolder(of: instancesDirectory_path, name: instanceName)
+}
+// KONEC
+
+/// Main loop
+while (keepProgramActive) {
+    displayHelp()
+    
+    var userInput = readLine()
+    
+    writeToConsole(format: .systemInfo, message: "User wrote: \(userInput!)")
+    
+    createNewInstance(called: "First Instance")
+    
+    //exitProgram(funny: false)
 }
 // KONEC
