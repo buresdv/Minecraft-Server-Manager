@@ -39,6 +39,13 @@ enum TextDecoration: String {
 func writeToConsole(format: TextDecoration, message: String) { // Psaní do konzole
     print("\(format.rawValue) \(message) \(newLine())")
 }
+func exitProgram(funny: Bool?) { // Vypnutí programu
+    let funnyExitMessages: [String] = ["Understandable, have a nice day", "Thank you for your time", "ight lemme head out", "Adios"]
+    if funny != nil {
+        writeToConsole(format: .success, message: "\(funnyExitMessages[Int.random(in: 0..<funnyExitMessages.count)])\n*dies*")
+    }
+    exit(-1)
+}
 func indentLine(indentSize: IndentationOptions) -> String { // Odsazení zpráv
     var iterator: Int = 0
     
@@ -112,7 +119,7 @@ writeToConsole(format: .systemInfo, message: "Checking is everything is good")
 if assetsFolderExists() {
     writeToConsole(format: .systemInfo, message: "All good! Found the Assets folder")
 } else {
-    writeToConsole(format: .systemInfo, message: "Couldn't find the Assets folder.\(newLine())Would you like to make a new one from scratch?\(newLine())[y] Re-create all folders and files from scratch\(newLine())[n] Exit")
+    writeToConsole(format: .warning, message: "Couldn't find the Assets folder.\(newLine())Would you like to make a new one from scratch?\(newLine())[y] Re-create all folders and files from scratch\(newLine())[n] Exit")
     
     let setUpAnswer = readLine()
     switch setUpAnswer {
@@ -120,9 +127,7 @@ if assetsFolderExists() {
         writeToConsole(format: .success, message: "Alright, let's get everything set up")
         setFoldersUp()
     case "n":
-        writeToConsole(format: .success, message: "Understandable, have a nice day")
-        print("*dies*")
-        exit(-1)
+        exitProgram(funny: true)
     default:
         writeToConsole(format: .error, message: "You didn't put in the correct answer")
     }
